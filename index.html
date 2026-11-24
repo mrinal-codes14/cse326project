@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Task Reminders</title>
+    <style>
+        * { box-sizing: border-box;
+        
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color:linear-gradient(135deg,#667eea,#764ba2);
+            margin: 0;
+            color: #252a3a;
+        }
+
+        header {
+            background: #3546ad;
+            color: white;
+            text-align: center;
+            padding: 30px 15px;
+        }
+
+        header h1 { margin: 0 0 10px; font-size: 32px; }
+        header p { margin: 0; font-size: 16px; }
+
+        .container {
+            width: 92%;
+            max-width: 1050px;
+            margin: 25px auto;
+        }
+
+        .card {
+            background-color:white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px rgba(30, 45, 90, 0.07);
+            transition: 0.3s ease;
+        }
+
+        .card:hover{
+            transform:translateY(-5px)
+        }
+
+        h2 { margin-top: 0; color: #3546ad; font-size: 23px;  font-weight: bold; }
+
+        input:focus, select:focus {
+            outline: none;
+            color: #222222;
+            background-color: #ffffff;
+            caret-color: #222222;
+            padding: 11px 12px;
+            border: 2px wavy #3546ad ;
+            border-radius: 7px;
+            font-size: 14px;
+            background: #f5f7ff;
+            transition: 0.3s ease;
+        }
+
+        button {
+            background: #3546ad;
+            color: white;
+            border:solid ba;
+            border-radius: 114px;
+            padding: 11px 16px;
+            font-size: 15px;
+            cursor:pointer;
+            transition: all 0.3s steps(4);
+            }
+
+        button:hover { background: #072dff; 
+        transform:translateY(-4px);
+        box-shadow: 0.5px 12px rgba(0,0,0,0.5)
+        }
+        
+
+        #loginPage {
+            max-width: 480px;
+            margin: 65px auto;
+            text-align: center;
+            padding: 35px 28px;
+            background-color: #e0e4ff;
+        }
+
+        #loginPage input {
+            width: 100%;
+            margin: 12px 0;
+        }
+
+        #loginPage button { width: 100%; margin-top: 16px; }
+
+        #dashboard { display: none;
+        }
+
+        .form-row, .filter-row, .task-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .stat {
+            background: #3d4fd1;
+            border: 1px solid #e0e4ff;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            color: #e0e4ff;
+        }
+
+        .stat h3 { color: #3546ad; font-size: 28px; margin: 0 0 7px; }
+        .stat p { margin: 0; color: #c1ddbb; }
+
+        .task {
+            border: 1px solid #e1e4ee;
+            border-left: 5px solid #3546ad;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 12px;
+            background: white;
+            transition:all 0.3s ease;
+        }
+
+        .task:hover{
+            transform: translateX(5px);
+            border-left-width: 8px;
+        }
+
+        .task.completed { border-left-color: #269653; background: #f3fbf5; }
+        .task h3 { margin: 0 0 9px; font-size: 17px; }
+        .task p { margin: 5px 0; color: #555d72; font-size: 14px; }
+        .delete-button { background: #d94343; }
+        .delete-button:hover { background: #ad2929; }
+        .small-text { color: #697087; font-size: 13px; }
+
+        @media (max-width: 650px) {
+            .stats { grid-template-columns: 1fr; }
+            .form-row input, .form-row select, .filter-row input,
+            .filter-row select { width: 100%; }
+            header h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Daily Task Reminders</h1>
+        <p>Plan your day and complete your tasks!</p>
+    </header>
+
+    <div class="container">
+
+        <!-- This is the only section shown when the website opens. -->
+        <div class="card" id="loginPage">
+            <h2>Login</h2>
+            <p>Enter your name to continue</p>
+            <input type="text" id="userName" placeholder="Enter your name" spellcheck="false" autocomplete="name">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Dashboard appears only after login. -->
+        <div id="dashboard">
+            <div class="card">
+                <h2 id="welcomeMessage">Welcome!</h2>
+                <button onclick="logout()">Logout</button>
+            </div>
+
+            <div class="card">
+                <h2>Dashboard</h2>
+                <div class="stats">
+                    <div class="stat"><h3 id="totalTasks">0</h3><p>Total Tasks</p></div>
+                    <div class="stat"><h3 id="pendingTasks">0</h3><p>Pending</p></div>
+                    <div class="stat"><h3 id="completedTasks">0</h3><p>Completed</p></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Add a New Task</h2>
+                <div class="form-row">
+                    <input type="text" id="taskName" placeholder="Enter task name">
+                    <input type="date" id="taskDate">
+                    <select id="taskCategory">
+                        <option value="Study">Study</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="taskPriority">
+                        <option value="Low">Low Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="High">High Priority</option>
+                    </select>
+                    <button onclick="addTask()">Add Task</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>My Tasks</h2>
+                <div class="filter-row">
+                    <input type="text" id="searchBox" placeholder="Search tasks" oninput="showTasks()">
+                    <select id="statusFilter" onchange="showTasks()">
+                        <option value="All">All Tasks</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div id="taskList"><p class="small-text">No tasks added yet.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var tasks = JSON.parse(localStorage.getItem("myTasks")) || [];
+
+        // Show the dashboard after the user enters their name.
+        function login() {
+            var name = document.getElementById("userName").value;
+
+            if (name == "") {
+                alert("Please enter your name.");
+            } else {
+                document.getElementById("loginPage").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                document.getElementById("welcomeMessage").innerHTML = "Hello, " + name + "!";
+                showTasks();
+            }
+        }
+
+        // Return to the login screen.
+        function logout() {
+            document.getElementById("dashboard").style.display = "none";
+            document.getElementById("loginPage").style.display = "block";
+            document.getElementById("userName").value = "";
+        }
+
+        function addTask() {
+            var name = document.getElementById("taskName").value;
+            var date = document.getElementById("taskDate").value;
+            var category = document.getElementById("taskCategory").value;
+            var priority = document.getElementById("taskPriority").value;
+
+            if (name == "" || date == "") {
+                alert("Please enter a task name and due date.");
+                return;
+            }
+
+            var task = {
+                name: name,
+                date: date,
+                category: category,
+                priority: priority,
+                completed: false
+            };
+
+            tasks.push(task);
+            localStorage.setItem("myTasks", JSON.stringify(tasks));
+
+            document.getElementById("taskName").value = "";
+            document.getElementById("taskDate").value = "";
+            showTasks();
+        }
+
+        function showTasks() {
+            var list = document.getElementById("taskList");
+            var search = document.getElementById("searchBox").value.toLowerCase();
+            var filter = document.getElementById("statusFilter").value;
+
+            list.innerHTML = "";
+
+            for (var i = 0; i < tasks.length; i++) {
+                var task = tasks[i];
+                var matchesSearch = task.name.toLowerCase().includes(search);
+                var matchesFilter = filter == "All" ||
+                    (filter == "Completed" && task.completed == true) ||
+                    (filter == "Pending" && task.completed == false);
+
+                if (matchesSearch && matchesFilter) {
+                    var taskBox = document.createElement("div");
+                    taskBox.className = "task";
+
+                    if (task.completed == true) {
+                        taskBox.className = "task completed";
+                    }
+
+                    taskBox.innerHTML =
+                        "<h3>" + task.name + "</h3>" +
+                        "<p><b>Due date:</b> " + task.date + "</p>" +
+                        "<p><b>Category:</b> " + task.category + "</p>" +
+                        "<p><b>Priority:</b> " + task.priority + "</p>" +
+                        "<p><b>Status:</b> " + (task.completed ? "Completed" : "Pending") + "</p>" +
+                        "<div class='task-buttons'>" +
+                        "<button onclick='completeTask(" + i + ")'>Mark Complete</button>" +
+                        "<button class='delete-button' onclick='deleteTask(" + i + ")'>Delete</button>" +
+                        "</div>";
+
+                    list.appendChild(taskBox);
+                }
+            }
+
+            if (list.innerHTML == "") {
+                list.innerHTML = "<p class='small-text'>No matching tasks found.</p>";
+            }
+
+            updateDashboard();
+        }
+
+        function completeTask(index) {
+            tasks[index].completed = true;
+            localStorage.setItem("myTasks", JSON.stringify(tasks));
+            showTasks();
+        }
+
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+            localStorage.setItem("myTasks", JSON.stringify(tasks));
+            showTasks();
+        }
+
+        function updateDashboard() {
+            var total = tasks.length;
+            var completed = 0;
+
+            for (var i = 0; i < tasks.length; i++) {
+                if (tasks[i].completed == true) {
+                    completed++;
+                }
+            }
+
+            document.getElementById("totalTasks").innerHTML = total;
+            document.getElementById("completedTasks").innerHTML = completed;
+            document.getElementById("pendingTasks").innerHTML = total - completed;
+        }
+    </script>
+</body>
+</html>
